@@ -10,7 +10,7 @@ def make_uniform(array, lenght):
         missing = lenght - array.shape[1]
         new_array = np.pad(array, ((0, 0), (0, missing)), 'constant', constant_values=(0,0))
     elif array.shape[1] > lenght:
-        new_array = array[lenght,:]
+        new_array = array[: , :lenght]
     elif array.shape[1] == lenght:
         new_array = array
     return new_array
@@ -61,7 +61,7 @@ for i in range(split_to):
 
 warblrb10k_public_labels = np.loadtxt('./data/warblrb10k_public_metadata_2018.csv', dtype=str, delimiter=',', skiprows=1)
 for i in range(split_to):
-    start_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * i)
-    end_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * (i + 1) - 1)
+    start_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * i)
+    end_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * (i + 1) - 1)
     preprocess_dateset(dataset_name = 'warblrb10k_public', path = './data/warblrb10k_public_wav/wav/', labels = warblrb10k_public_labels[start_idx:end_idx])
 
