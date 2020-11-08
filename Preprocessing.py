@@ -63,5 +63,5 @@ warblrb10k_public_labels = np.loadtxt('./data/warblrb10k_public_metadata_2018.cs
 for i in range(split_to):
     start_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * i)
     end_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * (i + 1) - 1)
-    preprocess_dateset(dataset_name = 'warblrb10k_public', path = './data/warblrb10k_public_wav/wav/', labels = warblrb10k_public_labels[start_idx:end_idx])
+    preprocess_dateset(dataset_name = 'warblrb10k_public_' + str(i+1), path = './data/warblrb10k_public_wav/wav/', labels = warblrb10k_public_labels[start_idx:end_idx])
 
