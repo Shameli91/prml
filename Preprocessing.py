@@ -25,7 +25,7 @@ def preprocess_dateset(dataset_name, path, labels, pad_to = 650):
     joint = []
     i = 1
     start = time.time()
-    for filename, _, label in labels[:20,:]:
+    for filename, _, label in labels:
         
         audio, rate = librosa.load(path + filename + '.wav')
         hop = int(np.round(rate * windowms / (2000) * hop_size)*2)  
