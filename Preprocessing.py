@@ -51,9 +51,17 @@ def preprocess_dateset(dataset_name, path, labels, pad_to = 650):
     print(f'{dataset_name} saved to ./data/preprocessed/')
 
 
+split_to = 10 # In how many parts should the dataset be handled
+
 ff1010bird_labels = np.loadtxt('./data/ff1010bird_metadata_2018.csv', dtype=str, delimiter=',', skiprows=1)
-preprocess_dateset(dataset_name = 'ff1010bird', path = './data/ff1010bird_wav/wav/', labels = ff1010bird_labels)
+for i in range(split_to):
+    start_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * i)
+    end_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * (i + 1) - 1)
+    preprocess_dateset(dataset_name = 'ff1010bird_' + str(i+1), path = './data/ff1010bird_wav/wav/', labels = ff1010bird_labels[start_idx:end_idx])
 
 warblrb10k_public_labels = np.loadtxt('./data/warblrb10k_public_metadata_2018.csv', dtype=str, delimiter=',', skiprows=1)
-preprocess_dateset(dataset_name = 'warblrb10k_public', path = './data/warblrb10k_public_wav/wav/', labels = warblrb10k_public_labels)
+for i in range(split_to):
+    start_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * i)
+    end_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * (i + 1) - 1)
+    preprocess_dateset(dataset_name = 'warblrb10k_public', path = './data/warblrb10k_public_wav/wav/', labels = warblrb10k_public_labels[start_idx:end_idx])
 
