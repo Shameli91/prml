@@ -1,7 +1,7 @@
 import numpy as np
 import time as time
 import matplotlib.pyplot as plt
-from matplotlib import image
+from cv2 import cv2
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -16,64 +16,72 @@ tf.config.experimental.set_memory_growth(
     physical_devices[0], enable=True
 )
 
+print(os.getcwd())
 #creates labelarray from the given CSV file
-labelArray = []
-with open('../ff1010bird_metadata_2018.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 0
-    for row in csv_reader:
-        if line_count == 0:
-            line_count += 1
-        else:
-            labelArray.append(row[2])
-            line_count += 1
-labelArray = np.array(labelArray)
-labelArray = to_categorical(labelArray)
+dataset = []
+labelset = []
+with open('./ff1010bird_metadata_2018.csv', newline='') as csv_file:
+    reader = csv.reader(csv_file, delimiter=',')
+    next(reader)
+    for row in reader:
+        img = cv2.imread('./ff1010bird_MEL_jpg_512/' + row[0] + '.wav.jpg')
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        dataset.append(gray)
+        labelset.append(row[2])
+print('first dataset done.')
 
-#sorts the names of the pictures into correct order
-def sorted_pics(data):
-    nameArray = []
-    for name in data:
-        number = name.strip('.wav.jpg')
-        nameArray.append(number)
-    for i in range(0, len(nameArray)):
-        nameArray[i] = int(nameArray[i])
-    nameArray = sorted(nameArray)
-    return nameArray
+with open('./warblrb10k_public_metadata_2018.csv', newline='') as csv_file:
+    reader = csv.reader(csv_file, delimiter=',')
+    next(reader)
+    for row in reader:
+        img = cv2.imread('./warblrb10k_MEL_jpg_512/' + row[0] + '.wav.jpg')
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        dataset.append(gray)
+        labelset.append(row[2])
+print('second dataset done.')
 
-nameArray = sorted_pics(os.listdir('../picsgs'))
+combined = list(zip(dataset, labelset))
+np.random.shuffle(combined)
+dataset[:], labelset[:] = zip(*combined)
+print('shuffled.')
 
-#creates the data array
-dataArray = []
-for name in nameArray:
-    dataArray.append(image.imread('../picsgs/' + str(name) + '.wav.jpg'))
-dataArray = np.array(dataArray)
 
-print('shape of labelArray: ', labelArray.shape)
-print('shape of dataArray: ', dataArray.shape)
+Xtest = dataset[int(len(dataset)*0.9):]
+Ytest = labelset[int(len(labelset)*0.9):]
+Xtrain = dataset[:int(len(dataset)*0.9)]
+Ytrain = labelset[:int(len(labelset)*0.9)]
+Xtest = np.array(Xtest)
+Ytest = np.array(Ytest)
+Ytest = to_categorical(Ytest)
+Xtrain = np.array(Xtrain)
+Ytrain = np.array(Ytrain)
+Ytrain = to_categorical(Ytrain)
 
 inputs = keras.Input(shape=(369, 496, 1), name='img')
 
 x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(inputs)
-#x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=32, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+
 x = layers.BatchNormalization()(x)
 x = layers.SpatialDropout2D(0.1)(x)
 x = layers.MaxPooling2D(pool_size=(2,2))(x)
 
 x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+
 x = layers.BatchNormalization()(x)
 x = layers.SpatialDropout2D(0.15)(x)
 x = layers.MaxPooling2D(pool_size=(2,2))(x)
 
 x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
-#x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+x = layers.Conv2D(filters=128, kernel_size=(3,3), strides=(1,1), activation='elu', padding='same')(x)
+
 x = layers.BatchNormalization()(x)
 x = layers.SpatialDropout2D(0.2)(x)
 x = layers.GlobalAveragePooling2D()(x)
@@ -83,7 +91,7 @@ outputs = layers.Dense(2, activation='sigmoid')(x)
 
 myCallbacks = [
     tf.keras.callbacks.EarlyStopping(
-        monitor='loss',
+        monitor='val_loss',
         min_delta=0.0001,
         patience=10,
         mode='auto',
@@ -99,12 +107,12 @@ model.compile(
     optimizer = keras.optimizers.Adam(0.001),
     metrics = ['accuracy']
 )
-#, callbacks=([myCallbacks])
-history = model.fit(dataArray, labelArray, batch_size = 16, epochs = 100, validation_split = 0.1)
-'''
-model.save('./models/model05/')
-test_scores = model.evaluate(testDataArray, testLabelArray, verbose = 2)
+
+history = model.fit(Xtrain, Ytrain, batch_size = 8, epochs = 100, verbose=2, callbacks=([myCallbacks]), validation_split = 0.1)
+
+model.save('./models/model01/')
+
+test_scores = model.evaluate(Xtest, Ytest, verbose = 2)
 print('Test loss: ', test_scores[0])
 print('Test accuracy: ', test_scores[1])
 
-'''

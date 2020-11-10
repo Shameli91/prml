@@ -20,6 +20,6 @@ for filename in os.listdir('../ff1010bird_wav/'):
     '''
 
     plt.axis('off')
-    plt.savefig('../pics2/' + filename + '.jpg', bbox_inches='tight', pad_inches=0)
+    plt.savefig('../ff1010bird_MEL_jpg_512/' + filename + '.jpg', bbox_inches='tight', pad_inches=0)
     plt.close('all')
     print(filename)
