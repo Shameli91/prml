@@ -46,7 +46,7 @@ def preprocess_dateset(dataset_name, path, labels, pad_to = 650):
     np.save('./data/preprocessed/' + dataset_name + '_specs', np.array(specs), allow_pickle=True)
     np.save('./data/preprocessed/' + dataset_name + '_mfcc', np.array(mfcc), allow_pickle=True)
     np.save('./data/preprocessed/' + dataset_name + '_joint', np.array(joint), allow_pickle=True)
-    np.save('./data/preprocessed/' + dataset_name + '_labels', ff1010bird_labels[:,2])
+    np.save('./data/preprocessed/' + dataset_name + '_labels', labels[:,2])
     print(f'Execution time for {dataset_name} preprocessing {time.time() - start} seconds')
     print(f'{dataset_name} saved to ./data/preprocessed/')
 
