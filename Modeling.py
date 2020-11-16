@@ -18,7 +18,7 @@ data = []
 labels = []
 start = time.time()
 for partition in datapartitions:
-    data.append(np.load(path + partition + preprocessors[0] + '.npy'))
+    data.append(np.load(path + partition + preprocessors[2] + '.npy'))
     labels.append(np.load(path + partition + '_labels.npy'))
     print(f'{partition} ready')
 
@@ -29,21 +29,22 @@ labels = np.concatenate(labels)
 model = Sequential([
     keras.layers.BatchNormalization(),
 
-    keras.layers.Conv2D(16, (3,3), input_shape=(32,650), activation='relu'),
-    keras.layers.SpatialDropout2D(0.1)
+    keras.layers.Conv2D(32, (5,5), input_shape=(32,650, 6), activation='relu'),
+    keras.layers.Conv2D(32, (5,5), activation='relu'),
+    keras.layers.SpatialDropout2D(0.1),
     keras.layers.MaxPooling2D(),
 
-    keras.layers.Conv2D(16, (3,3), activation='relu'),
-    keras.layers.SpatialDropout2D(0.1)
+    keras.layers.Conv2D(64, (5,5), activation='relu'),
+    keras.layers.SpatialDropout2D(0.1),
     keras.layers.MaxPooling2D(),
 
-    keras.layers.Conv2D(32, (3,3), activation='relu'),
-    keras.layers.SpatialDropout2D(0.1)
+    keras.layers.Conv2D(128, (3,3), activation='relu'),
+    keras.layers.SpatialDropout2D(0.1),
     keras.layers.MaxPooling2D(),
 
     keras.layers.Flatten(),
 
-    keras.layers.Dense(32, activation='relu'),
+    keras.layers.Dense(100, activation='relu'),
     keras.layers.Dense(1, activation='softmax')
 ])
 
@@ -68,8 +69,8 @@ model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr_schedule),
               metrics=['accuracy'])
 
 
-model.fit(data, labels, batch_size = 128, epochs=50, verbose=True, validation_split = 0.1))
+model.fit(data, labels, batch_size = 256, epochs=50, verbose=True, validation_split = 0.1)
 
-#model.save('./models/')
+model.save('./models/samuli3')
 
 print("Execution time %s minutes" % ((time.time() - start_time)/60))

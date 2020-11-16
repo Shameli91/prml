@@ -16,7 +16,7 @@ def make_uniform(array, lenght):
     return new_array
             
 def preprocess_dateset(dataset_name, path, labels, pad_to = 650):
-    target_sample_rate = 22050
+    target_sample_rate = 44500
     windowms = 64
     hop_size = 1/4
     freq_bins = 32
@@ -30,7 +30,7 @@ def preprocess_dateset(dataset_name, path, labels, pad_to = 650):
             audio = np.load('./data/audio_test/'+ filename)
             rate = 48000
         else:
-            audio, rate = librosa.load(path + filename + '.wav')
+            audio, rate = librosa.load(path + filename + '.wav', sr=None)
         audio = librosa.resample(audio, rate, target_sample_rate)
         rate = target_sample_rate
         
@@ -66,15 +66,15 @@ def preprocess_dateset(dataset_name, path, labels, pad_to = 650):
 split_to = 10 # In how many parts should the dataset be handled
 
 ff1010bird_labels = np.loadtxt('./data/ff1010bird_metadata_2018.csv', dtype=str, delimiter=',', skiprows=1)
-for i in range(1):
+for i in range(split_to):
     start_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * i)
-    end_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * (i + 1) - 1)
+    end_idx = int(np.round(ff1010bird_labels.shape[0] / split_to) * (i + 1))
     spec_test = preprocess_dateset(dataset_name = 'ff1010bird_' + str(i+1), path = './data/ff1010bird_wav/wav/', labels = ff1010bird_labels[start_idx:end_idx])
 
 warblrb10k_public_labels = np.loadtxt('./data/warblrb10k_public_metadata_2018.csv', dtype=str, delimiter=',', skiprows=1)
 for i in range(split_to):
     start_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * i)
-    end_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * (i + 1) - 1)
+    end_idx = int(np.round(warblrb10k_public_labels.shape[0] / split_to) * (i + 1))
     preprocess_dateset(dataset_name = 'warblrb10k_public_' + str(i+1), path = './data/warblrb10k_public_wav/wav/', labels = warblrb10k_public_labels[start_idx:end_idx])
 
 # a bit of a hack to load the testset through my poorly designed preprocessing pipeline. Change the paths as needed to point to testset data.
@@ -82,5 +82,5 @@ testset_paths = np.array(os.listdir('./data/audio_test'))
 testset_paths = np.vstack((testset_paths, np.zeros(testset_paths.shape), np.zeros(testset_paths.shape))).T
 for i in range(split_to):
     start_idx = int(np.round(testset_paths.shape[0] / split_to) * i)
-    end_idx = int(np.round(testset_paths.shape[0] / split_to) * (i + 1) - 1)
+    end_idx = int(np.round(testset_paths.shape[0] / split_to) * (i + 1))
     preprocess_dateset(dataset_name = 'test_set' + str(i+1), path = './data/audio_test/', labels = testset_paths[start_idx:end_idx])
